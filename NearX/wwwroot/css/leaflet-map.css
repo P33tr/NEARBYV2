@@ -1,4 +1,8 @@
-﻿#testMap {
-    height: 450px;
+﻿body {
+    padding: 0;
+    margin: 0;
+}
+ #testMap {
+    height: 100vh;
     width: 100%;
 }
