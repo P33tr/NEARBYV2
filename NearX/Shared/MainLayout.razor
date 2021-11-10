@@ -1,19 +1,22 @@
 ﻿@inherits LayoutComponentBase
+@inject ISnackbar Snackbar
 <MudThemeProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudLayout>
+    <MudAppBar Elevation="10">
+        <MudText Typo="Typo.h5">Nearby Cafe</MudText>   
+        <MudSpacer/>
+        <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="add" OnClick="@((e) => ClickedIt())"/>
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+@code {
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    void ClickedIt()
+    {
+        Snackbar.Add(" <MudAlert Severity='Severity.Info'>The reactor was fired up successfully</MudAlert>", severity:Severity.Success);
+    }
+}
