@@ -1,9 +1,12 @@
 ﻿@page "/"
-
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+@inject ISnackbar Snackbar
+@inherits IndexBase
+<LeafletMap Map="PositionMap" TileLayer="OpenStreetMapsTileLayer" />
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1);
+        Snackbar.Add(" <MudAlert Severity='Severity.Info'>We are in the main page</MudAlert>", severity:Severity.Success);
+    }
+}
