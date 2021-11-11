@@ -1,6 +1,7 @@
 ﻿using Blazor.Leaflet.OpenStreetMap.LeafletMap;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MudBlazor;
 using NearX.Models;
 
 namespace NearX.Pages
@@ -68,15 +69,22 @@ namespace NearX.Pages
         {
             var mapCentre = new LatLng(MapStateViewModel.MapCentreLatitude, MapStateViewModel.MapCentreLongitude);
             await PositionMap.SetView(mapCentre, MapStateViewModel.Zoom);
+
         }
         protected async void AddMarkerAtLatLng(LatLng latlng)
         {
 
             var div = @"
-            <div style=""background-color: #00000088; border-radius: 10px; padding: 16px;width: 80px"">
-                <img src=""leaf-red.png""/>
-            </div>
+                <div class="" blob red"">
+                <img src=""/images/icons8-home-24.png"" class=""my-marker""/ >
+                </div>
             ";
+
+            //var div = @"
+            //<div style=""background-color: #00000088; border-radius: 10px; padding: 16px;width: 80px"">
+            //    <img src=""/images/home.png""/>
+            //</div>
+            //";
 
             var divIcon = new DivIcon(new DivIconOptions() { Html = div });
 
