@@ -10,6 +10,8 @@
         await Task.Delay(1);
         Snackbar.Add(" <MudAlert Severity='Severity.Info'>We are going to try to locate you.</MudAlert>", severity:Severity.Success);
         await JS.InvokeAsync<string>("getMyLocation",DotNetObjectReference.Create(this));
+
+        await WireMeUp();
     }
 
 }

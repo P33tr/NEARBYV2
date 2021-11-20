@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using NearX.Models;
+using NearX.Services;
+using NearX.Utilities;
+
 
 namespace NearX.Pages
 {
+
     public class IndexBase : ComponentBase, IAsyncDisposable
     {
         protected Map PositionMap;
@@ -13,9 +17,12 @@ namespace NearX.Pages
         protected MapStateViewModel MapStateViewModel;
         protected MarkerViewModel MarkerViewModel;
 
+        [Inject] private ISnackbar _snackbar { get; set; }
 
+        [Inject] private IHttpClientFactory _httpClientFactory { get; set; }
         public IndexBase() : base()
         {
+
             var mapCentre = new LatLng(-42, 175); // Centred on New Zealand
             MapStateViewModel = new MapStateViewModel
             {
@@ -28,6 +35,9 @@ namespace NearX.Pages
                 Center = mapCentre,
                 Zoom = MapStateViewModel.Zoom
             });
+            PositionMap.SubscribeToEvents();
+
+
             OpenStreetMapsTileLayer = new TileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 new TileLayerOptions
@@ -41,9 +51,82 @@ namespace NearX.Pages
 
         }
 
+        public async Task WireMeUp()
+        {
+            await PositionMap.SubscribeToEvents();
+            PositionMap.OnMoveEnd += async (mymap, e) =>
+            {
+                
+
+                Map currentMap = (Map)mymap;
+
+                var mapCentre = await PositionMap.GetCenter();
+                double latCenter = mapCentre.Lat;
+                double lngCenter = mapCentre.Lng;
+
+                MapPoint mp = new MapPoint()
+                {
+                    Latitude = latCenter,
+                    Longitude = lngCenter
+                };
+                // box will be 20km by 20km
+                
+                int currentZoom = await PositionMap.GetZoom();
+                Console.WriteLine($"ZOOM: {currentZoom}");
+                double area = 100 / (currentZoom * 0.5);
+
+                // dont search if area is too large
+                if (area < 20)
+                {
+                    _snackbar.Add("Finding Cafes.", Severity.Success);
+                    Console.WriteLine($"ZOOM: {currentZoom} Area: {area}");
+                    var bounds = BoxUtility.GetBoundingBox(mp, area);
+
+                    Console.WriteLine(
+                        $"result of bounding calculation minlat:{bounds.MinPoint.Latitude}, minlng:{bounds.MinPoint.Longitude}," +
+                        $" maxlat:{bounds.MaxPoint.Latitude}, maxlng:{bounds.MaxPoint.Longitude}");
+
+                    List<LatLng> boxPoints = new List<LatLng>();
+                    LatLng pa = new LatLng(bounds.MinPoint.Latitude, bounds.MinPoint.Longitude);
+                    LatLng pb = new LatLng(bounds.MaxPoint.Latitude, bounds.MinPoint.Longitude);
+                    LatLng pc = new LatLng(bounds.MaxPoint.Latitude, bounds.MaxPoint.Longitude);
+                    LatLng pd = new LatLng(bounds.MinPoint.Latitude, bounds.MaxPoint.Longitude);
+                    LatLng pe = new LatLng(bounds.MinPoint.Latitude, bounds.MinPoint.Longitude);
+
+                    boxPoints.Add(pa);
+                    boxPoints.Add(pb);
+                    boxPoints.Add(pc);
+                    boxPoints.Add(pd);
+                    boxPoints.Add(pe);
+
+                    Polyline searchArea = new Polyline(boxPoints, null);
+                    await searchArea.AddTo(PositionMap);
+
+                    string box =
+                        $" ({bounds.MinPoint.Latitude},{bounds.MinPoint.Longitude},{bounds.MaxPoint.Latitude},{bounds.MaxPoint.Longitude})";
+                    OverpassService oService = new OverpassService(_httpClientFactory);
+                    var res = await oService.GetCafesAsync("cafe", box);
+
+
+                    foreach (var cafe in res.elements)
+                    {
+                        AddCafeMarkerAtLatLng(cafe);
+                    }
+
+                    await searchArea.Remove();
+                }
+
+                else
+                {
+                    _snackbar.Add("Area to large to search for Cafes.", Severity.Normal);
+                }
+            };
+        }
+
         [JSInvokable]
         public async Task SetMyLocationAsync(string passedValue)
         {
+            _snackbar.Add("Located You !", Severity.Success);
             string[] latlngArray = passedValue.Split(":");
             double lat = double.Parse(latlngArray[0]);
             double lon = double.Parse(latlngArray[1]);
@@ -51,6 +134,7 @@ namespace NearX.Pages
             await PositionMap.SetView(myLocation, 17);
 
             AddMarkerAtLatLng(new LatLng(lat, lon));
+
         }
 
         protected async void GetMapState()
@@ -71,6 +155,57 @@ namespace NearX.Pages
             await PositionMap.SetView(mapCentre, MapStateViewModel.Zoom);
 
         }
+
+        protected async void AddCafeMarkerAtLatLng(Element cafElement)
+        {
+            LatLng cafeLatLng = new LatLng(cafElement.lat, cafElement.lon);
+            var parentDiv = $@"<div>";
+            var titleHtml = @$"<div class=""grow2"" >";
+            if (!string.IsNullOrEmpty(cafElement.tags.name)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.description}</span><div>"; }
+            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
+            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
+            titleHtml += "</div>";
+
+            var div = @"
+                <div class=""xx"">
+                    <img src=""/images/cafe.png"" class=""my-marker""/ >
+                </div>";
+            div += titleHtml;
+            parentDiv += div;
+            parentDiv += "</div>";
+            //var div = @"
+            //<div style=""background-color: #00000088; border-radius: 10px; padding: 16px;width: 80px"">
+            //    <img src=""/images/home.png""/>
+            //</div>
+            //";
+
+            var divIcon = new DivIcon(new DivIconOptions() { Html = parentDiv });
+
+            // var icon = new Icon(new IconOptions()
+            // {
+            //     IconUrl = "leaf-orange.png",
+            //     IconSize = new Point(64, 64)
+            // });
+
+            //";
+
+            var marker = new Marker(cafeLatLng, new MarkerOptions
+            {
+                Keyboard = MarkerViewModel.Keyboard,
+                Title = MarkerViewModel.Title,
+                Alt = MarkerViewModel.Alt,
+                ZIndexOffset = MarkerViewModel.ZIndexOffset,
+                Opacity = MarkerViewModel.Opacity,
+                RiseOnHover = MarkerViewModel.RiseOnHover,
+                RiseOffset = MarkerViewModel.RiseOffset,
+            });
+
+            await marker.AddTo(PositionMap);
+            //await icon.AddTo(marker);
+            await divIcon.AddTo(marker);
+        }
+
         protected async void AddMarkerAtLatLng(LatLng latlng)
         {
 
@@ -93,6 +228,7 @@ namespace NearX.Pages
             //     IconUrl = "leaf-orange.png",
             //     IconSize = new Point(64, 64)
             // });
+
 
             var marker = new Marker(latlng, new MarkerOptions
             {

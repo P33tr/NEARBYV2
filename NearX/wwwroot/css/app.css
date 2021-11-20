@@ -1,4 +1,4 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -64,6 +64,31 @@ a, .btn-link {
     }
 
 /* from here onwards */
+/*===================*/
+
+/* used when hiding the rollover on the cafe icon */
+
+
+.grow2 {
+    position: absolute;
+    background-color: transparent;
+    padding: 5px 5px 5px 5px;
+    border-radius: 10px;
+    height: 0px;
+    width: 0%;
+    margin: -1% 5px 1% -60px;
+    float: left;
+/*    position: relative;*/
+    transition: height 0.5s;
+    -webkit-transition: height 0.5s;
+    text-align: center;
+    overflow: hidden;
+    transition: 0.5s;
+    z-index: 10;
+}
+
+.grow2 {}
+
 .my-marker {
     background: transparent;
     border: 0px transparent;
@@ -71,8 +96,23 @@ a, .btn-link {
     margin-top: -1px;
     width: 40px;
     height: 40px;
+    z-index: 1;
 }
 
+.parentdiv {
+    position: relative;
+}
+
+.xx:hover + .grow2 {
+    /*    display: block;*/
+    background-color: white;
+    height: 145px;
+    width: 10vw;
+
+}
+.leaflet-marker-icon:not(:hover) {
+    z-index: 0 !important;
+}
 
 
 .blobs-container {
