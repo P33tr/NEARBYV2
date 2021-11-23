@@ -27,24 +27,32 @@
 
     public class Tags
     {
+        //used
         public string addrhousenumber { get; set; }
         public string addrpostcode { get; set; }
+        //used
         public string addrstreet { get; set; }
         public string amenity { get; set; }
+        //used
         public string name { get; set; }
         public string old_name { get; set; }
+        //used
         public string addrcity { get; set; }
         public string fhrsid { get; set; }
+        // used
         public string website { get; set; }
         public string cuisine { get; set; }
         public string dietvegan { get; set; }
         public string dietvegetarian { get; set; }
         public string internet_access { get; set; }
         public string note { get; set; }
+        //used
         public string opening_hours { get; set; }
+        //used
         public string phone { get; set; }
         public string smoking { get; set; }
         public string wheelchair { get; set; }
+        //used
         public string brand { get; set; }
         public string brandwikidata { get; set; }
         public string brandwikipedia { get; set; }

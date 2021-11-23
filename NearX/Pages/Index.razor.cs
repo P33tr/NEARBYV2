@@ -161,15 +161,23 @@ namespace NearX.Pages
             LatLng cafeLatLng = new LatLng(cafElement.lat, cafElement.lon);
             var parentDiv = $@"<div>";
             var titleHtml = @$"<div class=""grow2"" >";
-            if (!string.IsNullOrEmpty(cafElement.tags.name)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
-            if (!string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.description}</span><div>"; }
-            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
-            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.name)) { titleHtml += $@"<divSTYLE=""font-weight:bold""> {cafElement.tags.name}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.brand)) { titleHtml += $"<div>{cafElement.tags.brand}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div>{cafElement.tags.description}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.website)) { titleHtml += $"<div>{cafElement.tags.website}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.phone)) { titleHtml += $"<div>{cafElement.tags.phone}<div>"; }
+
+            if (!string.IsNullOrEmpty(cafElement.tags.opening_hours)) { titleHtml += $"<div>{cafElement.tags.opening_hours}<div>"; }
+
+            string address = $"{cafElement.tags.addrhousenumber} {cafElement.tags.addrstreet} {cafElement.tags.addrhousenumber} {cafElement.tags.addrcity} {cafElement.tags.addrpostcode}";
+
+            if (!string.IsNullOrEmpty(address)) { titleHtml += $"<div>{address}<div>"; }
+
             titleHtml += "</div>";
 
             var div = @"
                 <div class=""xx"">
-                    <img src=""/images/cafe.png"" class=""my-marker""/ >
+                    <img src=""/images/icons8-cafe-30.png"" class=""my-marker""/ >
                 </div>";
             div += titleHtml;
             parentDiv += div;
@@ -200,7 +208,7 @@ namespace NearX.Pages
                 RiseOnHover = MarkerViewModel.RiseOnHover,
                 RiseOffset = MarkerViewModel.RiseOffset,
             });
-
+            
             await marker.AddTo(PositionMap);
             //await icon.AddTo(marker);
             await divIcon.AddTo(marker);
