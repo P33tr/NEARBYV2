@@ -18,6 +18,8 @@ namespace NearX.Pages
         protected MarkerViewModel MarkerViewModel;
 
         [Inject] private ISnackbar _snackbar { get; set; }
+        [Inject] private IDialogService _dialogService { get; set; }
+
 
         [Inject] private IHttpClientFactory _httpClientFactory { get; set; }
         public IndexBase() : base()
@@ -205,15 +207,24 @@ namespace NearX.Pages
 
 
 
-            marker.OnClick += (marker, mouseEventArgs) => SomeMarkerMethod(marker, mouseEventArgs);
+            marker.OnClick += (marker, mouseEventArgs) => SomeMarkerMethod(marker, mouseEventArgs, cafElement);
             await marker.SubscribeToEvents();
 
         }
-        private void SomeMarkerMethod(object markerObject, LeafletMouseEventArgs mouseEventArgs)
+        private void SomeMarkerMethod(object markerObject, LeafletMouseEventArgs mouseEventArgs, Element cafe)
         {
             Console.WriteLine(markerObject);
             Marker youclickedme = (Marker)markerObject;
-            _snackbar.Add("You clicked me", Severity.Success);
+            _snackbar.Add($"You clicked me {cafe.tags.name}", Severity.Success);
+
+            var parameters = new DialogParameters()
+            {
+                ["cafe"] = cafe
+            };
+
+            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+            _dialogService.Show<CafeComponent>("Cafe", parameters, options);
         }
         private void SomeMethod(Object someObject, LeafletMouseEventArgs mouseEventArgs)
         {
