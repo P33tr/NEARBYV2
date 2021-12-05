@@ -121,7 +121,8 @@ namespace NearX.Pages
             await PositionMap.SetView(myLocation, 17);
 
             AddMarkerAtLatLng(new LatLng(lat, lon));
-
+            PositionMap.OnClick += (someObject, mouseEventArgs) => SomeMethod(someObject, mouseEventArgs);
+            await PositionMap.SubscribeToEvents();
         }
 
         protected async void GetMapState()
@@ -197,12 +198,16 @@ namespace NearX.Pages
                 BubblingMouseEvents = true
             });
 
-            marker.OnClick += (marker, mouseEventArgs) => SomeMarkerMethod(marker, mouseEventArgs);
-            await marker.SubscribeToEvents();
 
             await marker.AddTo(PositionMap);
             //await icon.AddTo(marker);
             await divIcon.AddTo(marker);
+
+
+
+            marker.OnClick += (marker, mouseEventArgs) => SomeMarkerMethod(marker, mouseEventArgs);
+            await marker.SubscribeToEvents();
+
         }
         private void SomeMarkerMethod(object markerObject, LeafletMouseEventArgs mouseEventArgs)
         {
@@ -210,7 +215,10 @@ namespace NearX.Pages
             Marker youclickedme = (Marker)markerObject;
             _snackbar.Add("You clicked me", Severity.Success);
         }
-
+        private void SomeMethod(Object someObject, LeafletMouseEventArgs mouseEventArgs)
+        {
+            Console.WriteLine(someObject);
+        }
 
         protected async void AddMarkerAtLatLng(LatLng latlng)
         {
