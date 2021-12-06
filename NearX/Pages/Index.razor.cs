@@ -18,6 +18,8 @@ namespace NearX.Pages
         protected MarkerViewModel MarkerViewModel;
 
         [Inject] private ISnackbar _snackbar { get; set; }
+        [Inject] private IDialogService _dialogService { get; set; }
+
 
         [Inject] private IHttpClientFactory _httpClientFactory { get; set; }
         public IndexBase() : base()
@@ -56,54 +58,41 @@ namespace NearX.Pages
             await PositionMap.SubscribeToEvents();
             PositionMap.OnMoveEnd += async (mymap, e) =>
             {
-                
 
+                int currentZoom = await PositionMap.GetZoom();
+                if(currentZoom > 10)
+                {
                 Map currentMap = (Map)mymap;
 
-                var mapCentre = await PositionMap.GetCenter();
-                double latCenter = mapCentre.Lat;
-                double lngCenter = mapCentre.Lng;
 
-                MapPoint mp = new MapPoint()
-                {
-                    Latitude = latCenter,
-                    Longitude = lngCenter
-                };
-                // box will be 20km by 20km
-                
-                int currentZoom = await PositionMap.GetZoom();
-                Console.WriteLine($"ZOOM: {currentZoom}");
-                double area = 100 / (currentZoom * 0.5);
 
-                // dont search if area is too large
-                if (area < 20)
-                {
                     _snackbar.Add("Finding Cafes.", Severity.Success);
-                    Console.WriteLine($"ZOOM: {currentZoom} Area: {area}");
-                    var bounds = BoxUtility.GetBoundingBox(mp, area);
+
+                    var bounds = await PositionMap.GetBounds(); //BoxUtility.GetBoundingBox(mp, area);
 
                     Console.WriteLine(
-                        $"result of bounding calculation minlat:{bounds.MinPoint.Latitude}, minlng:{bounds.MinPoint.Longitude}," +
-                        $" maxlat:{bounds.MaxPoint.Latitude}, maxlng:{bounds.MaxPoint.Longitude}");
+                        $"result of bounding calculation minlat:{bounds._southWest.Lat}, minlng:{bounds._southWest.Lng}," +
+                        $" maxlat:{bounds._northEast.Lat}, maxlng:{bounds._northEast.Lng}");
 
                     List<LatLng> boxPoints = new List<LatLng>();
-                    LatLng pa = new LatLng(bounds.MinPoint.Latitude, bounds.MinPoint.Longitude);
-                    LatLng pb = new LatLng(bounds.MaxPoint.Latitude, bounds.MinPoint.Longitude);
-                    LatLng pc = new LatLng(bounds.MaxPoint.Latitude, bounds.MaxPoint.Longitude);
-                    LatLng pd = new LatLng(bounds.MinPoint.Latitude, bounds.MaxPoint.Longitude);
-                    LatLng pe = new LatLng(bounds.MinPoint.Latitude, bounds.MinPoint.Longitude);
+                    LatLng pa = new LatLng(bounds._southWest.Lat, bounds._southWest.Lng);
+                    LatLng pb = new LatLng(bounds._northEast.Lat, bounds._southWest.Lng);
+                    LatLng pc = new LatLng(bounds._northEast.Lat, bounds._northEast.Lng);
+                    LatLng pd = new LatLng(bounds._southWest.Lat, bounds._northEast.Lng);
+                    LatLng pe = new LatLng(bounds._southWest.Lat, bounds._southWest.Lng);
 
                     boxPoints.Add(pa);
                     boxPoints.Add(pb);
                     boxPoints.Add(pc);
                     boxPoints.Add(pd);
                     boxPoints.Add(pe);
+                    // uncomment to add search area box
+                    //Polyline searchArea = new Polyline(boxPoints, null);
 
-                    Polyline searchArea = new Polyline(boxPoints, null);
-                    await searchArea.AddTo(PositionMap);
+                    //await searchArea.AddTo(PositionMap);
 
                     string box =
-                        $" ({bounds.MinPoint.Latitude},{bounds.MinPoint.Longitude},{bounds.MaxPoint.Latitude},{bounds.MaxPoint.Longitude})";
+                        $" ({bounds._southWest.Lat},{bounds._southWest.Lng},{bounds._northEast.Lat},{bounds._northEast.Lng})";
                     OverpassService oService = new OverpassService(_httpClientFactory);
                     var res = await oService.GetCafesAsync("cafe", box);
 
@@ -113,7 +102,7 @@ namespace NearX.Pages
                         AddCafeMarkerAtLatLng(cafe);
                     }
 
-                    await searchArea.Remove();
+                    //await searchArea.Remove();
                 }
 
                 else
@@ -134,7 +123,8 @@ namespace NearX.Pages
             await PositionMap.SetView(myLocation, 17);
 
             AddMarkerAtLatLng(new LatLng(lat, lon));
-
+            PositionMap.OnClick += (someObject, mouseEventArgs) => SomeMethod(someObject, mouseEventArgs);
+            await PositionMap.SubscribeToEvents();
         }
 
         protected async void GetMapState()
@@ -161,15 +151,23 @@ namespace NearX.Pages
             LatLng cafeLatLng = new LatLng(cafElement.lat, cafElement.lon);
             var parentDiv = $@"<div>";
             var titleHtml = @$"<div class=""grow2"" >";
-            if (!string.IsNullOrEmpty(cafElement.tags.name)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
-            if (!string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.description}</span><div>"; }
-            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
-            //if (string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div><span> {cafElement.tags.name}</span><div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.name)) { titleHtml += $@"<divSTYLE=""font-weight:bold""> {cafElement.tags.name}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.brand)) { titleHtml += $"<div>{cafElement.tags.brand}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.description)) { titleHtml += $"<div>{cafElement.tags.description}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.website)) { titleHtml += $"<div>{cafElement.tags.website}<div>"; }
+            if (!string.IsNullOrEmpty(cafElement.tags.phone)) { titleHtml += $"<div>{cafElement.tags.phone}<div>"; }
+
+            if (!string.IsNullOrEmpty(cafElement.tags.opening_hours)) { titleHtml += $"<div>{cafElement.tags.opening_hours}<div>"; }
+
+            string address = $"{cafElement.tags.addrhousenumber} {cafElement.tags.addrstreet} {cafElement.tags.addrhousenumber} {cafElement.tags.addrcity} {cafElement.tags.addrpostcode}";
+
+            if (!string.IsNullOrEmpty(address)) { titleHtml += $"<div>{address}<div>"; }
+
             titleHtml += "</div>";
 
             var div = @"
                 <div class=""xx"">
-                    <img src=""/images/cafe.png"" class=""my-marker""/ >
+                    <img src=""/images/icons8-cafe-30.png"" class=""my-marker""/ >
                 </div>";
             div += titleHtml;
             parentDiv += div;
@@ -199,11 +197,38 @@ namespace NearX.Pages
                 Opacity = MarkerViewModel.Opacity,
                 RiseOnHover = MarkerViewModel.RiseOnHover,
                 RiseOffset = MarkerViewModel.RiseOffset,
+                BubblingMouseEvents = true
             });
+
 
             await marker.AddTo(PositionMap);
             //await icon.AddTo(marker);
             await divIcon.AddTo(marker);
+
+
+
+            marker.OnClick += (marker, mouseEventArgs) => SomeMarkerMethod(marker, mouseEventArgs, cafElement);
+            await marker.SubscribeToEvents();
+
+        }
+        private void SomeMarkerMethod(object markerObject, LeafletMouseEventArgs mouseEventArgs, Element cafe)
+        {
+            Console.WriteLine(markerObject);
+            Marker youclickedme = (Marker)markerObject;
+            _snackbar.Add($"You clicked me {cafe.tags.name}", Severity.Success);
+
+            var parameters = new DialogParameters()
+            {
+                ["cafe"] = cafe
+            };
+
+            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+            _dialogService.Show<CafeComponent>("Cafe", parameters, options);
+        }
+        private void SomeMethod(Object someObject, LeafletMouseEventArgs mouseEventArgs)
+        {
+            Console.WriteLine(someObject);
         }
 
         protected async void AddMarkerAtLatLng(LatLng latlng)
@@ -271,7 +296,7 @@ namespace NearX.Pages
                 ZIndexOffset = MarkerViewModel.ZIndexOffset,
                 Opacity = MarkerViewModel.Opacity,
                 RiseOnHover = MarkerViewModel.RiseOnHover,
-                RiseOffset = MarkerViewModel.RiseOffset,
+                RiseOffset = MarkerViewModel.RiseOffset
             });
 
             await marker.AddTo(PositionMap);
