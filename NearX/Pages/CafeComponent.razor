@@ -6,46 +6,12 @@
         <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>
     </TitleContent>
     <DialogContent>
-        @if (!string.IsNullOrEmpty(cafe.tags.name))
-        {
-            <MudTextField Value="@cafe.tags.name" Label="Name" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.LocalCafe" AdornmentColor="Color.Warning"/> 
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.brand))
-        {
-            <MudTextField Value="@cafe.tags.brand" Label="Brand" ReadOnly="true"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.internet_access))
-        {
-            <MudTextField Value="@cafe.tags.internet_access" Label="Internet Access" ReadOnly="true"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.description))
-        {
-            <MudTextField Value="@cafe.tags.description" Label="Description" ReadOnly="true"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.wifi))
-        {
-            <MudTextField Value="@cafe.tags.wifi" Label="Wifi" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Wifi" AdornmentColor="Color.Warning"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.email))
-        {
-            <MudTextField Value="@cafe.tags.email" Label="Email" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" AdornmentColor="Color.Warning"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.url))
-        {
-            <MudTextField Value="@cafe.tags.url" Label="Url" ReadOnly="true"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.website))
-        {
-            <MudTextField Value="@cafe.tags.website" Label="Website" ReadOnly="true"Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Web" AdornmentColor="Color.Warning"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.wheelchair))
-        {
-            <MudTextField Value="@cafe.tags.wheelchair" Label="Wheelchair access" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Accessible" AdornmentColor="Color.Warning"/>
-        }
-        @if (!string.IsNullOrEmpty(cafe.tags.phone))
-        {
-            <MudTextField Value="@cafe.tags.phone" Label="Phone" ReadOnly="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ContactPhone" AdornmentColor="Color.Warning"/>
-        }
+        <MudTable Items="@cafe.TagsList">
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Value</MudTd>
+            </RowTemplate>
+        </MudTable>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Close">Close</MudButton>
