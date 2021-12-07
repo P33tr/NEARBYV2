@@ -37,8 +37,10 @@ namespace NearX.Services
 
             OverpassResult result = JsonSerializer.Deserialize<OverpassResult>(httpResponseMessage);
 
-
-
+            foreach (var element in result.elements)
+            {
+                element.FillTagsList();
+            }
             return result;
 
         }

@@ -1,0 +1,1 @@
+﻿https://www.c-sharpcorner.com/article/blazor-create-spa-with-azure-database-for-mariadb-server/
