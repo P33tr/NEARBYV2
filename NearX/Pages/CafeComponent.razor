@@ -9,7 +9,14 @@
         <MudTable Items="@cafe.TagsList">
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
+                @if(@context.IsLink)
+                {
+                <MudTd><MudLink Href="@context.Value" Target="_blank">@context.Value</MudLink></MudTd>
+                }
+                else
+                {
                 <MudTd>@context.Value</MudTd>
+                }
             </RowTemplate>
         </MudTable>
     </DialogContent>

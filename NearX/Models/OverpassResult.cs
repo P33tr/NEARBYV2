@@ -109,6 +109,7 @@
             {
                 TagsList.Add(new Tag()
                 {
+                    IsLink = true,
                     Name = "website",
                     Value = tags.website,
                     Order = 0
@@ -542,9 +543,15 @@
 
     public class Tag
     {
+        public Tag()
+        {
+            IsLink = false;
+        }
         public string Name { get; set; }
         public string Value { get; set; }
         public int Order { get; set; }
+
+        public bool IsLink { get; set; }
 
     }
 
