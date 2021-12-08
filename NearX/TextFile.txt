@@ -1,1 +1,7 @@
 ﻿https://www.c-sharpcorner.com/article/blazor-create-spa-with-azure-database-for-mariadb-server/
+https://codewithmukesh.com/blog/authentication-in-blazor-webassembly/
+
+
+setting up mariaDB
+==================
+https://blog.georgekosmidis.net/2020/07/15/using-mariadb-in-an-aspnet-core-api-with-entity-framework-core/
