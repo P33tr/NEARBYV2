@@ -21,5 +21,20 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.ShowTransitionDuration = 300;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
-builder.Services.AddHttpClient();
+
+var baseHttp = new HttpClient()
+{
+    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+};
+builder.Services.AddScoped(sp => baseHttp);
+using var response = await baseHttp.GetAsync("AppSettings.json");
+using var stream = await response.Content.ReadAsStreamAsync();
+builder.Configuration.AddJsonStream(stream);
+string serverEndpoint = builder.Configuration.GetSection("NearX:ServerEndpoint").Value;
+
+builder.Services.AddHttpClient("NearXServer", (cl) =>
+{
+    cl.BaseAddress = new Uri(serverEndpoint);
+});
+
 await builder.Build().RunAsync();

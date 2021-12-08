@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearX", "NearX\NearX.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Leaflet.OpenStreetMap", "LeafletBlazor\Darnton.Blazor.Leaflet\Blazor.Leaflet.OpenStreetMap.csproj", "{E99782F4-DB52-45FC-ADB8-B8D14D7BDA75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NearXShared", "NearXShared\NearXShared.csproj", "{B3E746A6-C039-4CFB-A492-40C09265CA51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearXShared", "NearXShared\NearXShared.csproj", "{B3E746A6-C039-4CFB-A492-40C09265CA51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NearXServer", "NearXServer\NearXServer.csproj", "{91A4C2FB-6860-4D88-B4E5-3C5AE75B9828}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NearXServer", "NearXServer\NearXServer.csproj", "{91A4C2FB-6860-4D88-B4E5-3C5AE75B9828}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

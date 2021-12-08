@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LeafletBlazor\Darnton.Blazor.Leaflet\Blazor.Leaflet.OpenStreetMap.csproj" />
+    <ProjectReference Include="..\NearXShared\NearXShared.csproj" />
   </ItemGroup>
 
 </Project>
