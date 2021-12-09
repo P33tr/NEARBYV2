@@ -60,7 +60,7 @@ async Task Delete(int reviewId)
     var review = reviews.First(x => x.Id == reviewId);
     if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {review.Id}"))
     {
-        await client.DeleteAsync($"api/developer/{reviewId}");
+        await client.DeleteAsync($"api/review/{reviewId}");
         await OnInitializedAsync();
     }
 }

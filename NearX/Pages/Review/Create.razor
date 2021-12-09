@@ -1,0 +1,19 @@
+﻿@page "/review/create"
+@inject IHttpClientFactory _clientFactory
+@inject NavigationManager _navManager
+
+<h3>Create</h3>
+
+<Form ButtonText="Create Review" review="@review"
+      OnValidSubmit="@CreateReview" />
+
+@code {
+    Review review = new Review();
+    async Task CreateReview()
+    {
+        HttpClient client = _clientFactory.CreateClient("NearXServer");
+        await client.PostAsJsonAsync("api/review", review);
+
+        _navManager.NavigateTo("reviews");
+    }
+}
