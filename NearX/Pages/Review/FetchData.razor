@@ -1,0 +1,67 @@
+﻿@using NearXShared.Models
+@page "/reviews"
+@inject IHttpClientFactory _clientFactory
+@inject IJSRuntime js
+
+<h3>Reviews</h3>
+<small>Add as many reviews as you wish.</small>
+<div class="form-group">
+    <a class="btn btn-success" href="review/create"><i class="oi oi-plus"></i> Create New</a>
+</div>
+<br>
+
+@if (reviews == null)
+{
+    <text>Loading...</text>
+}
+else if (reviews.Length == 0)
+{
+    <text>No Records Found.</text>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>User Id</th>
+            <th>Note</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (Review review in reviews)
+        {
+            <tr>
+                <td>@review.Id</td>
+                <td>@review.UserId</td>
+                <td>@review.Note</td>
+                <td>
+                    <a class="btn btn-success" href="review/edit/@review.Id">Edit</a>
+                    <button class="btn btn-danger" @onclick="@(() => Delete(review.Id))">Delete</button>
+                </td>
+            </tr>
+        }
+
+        </tbody>
+    </table>
+}
+@code {
+    HttpClient client;
+    Review[] reviews { get; set; }
+protected override async Task OnInitializedAsync()
+{
+    client = _clientFactory.CreateClient("NearXServer");
+    reviews = await client.GetFromJsonAsync<Review[]>("api/review");
+}
+
+async Task Delete(int reviewId)
+{
+    var review = reviews.First(x => x.Id == reviewId);
+    if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {review.Id}"))
+    {
+        await client.DeleteAsync($"api/review/{reviewId}");
+        await OnInitializedAsync();
+    }
+}
+}

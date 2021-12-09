@@ -1,0 +1,33 @@
+﻿@page "/review/edit/{reviewId:int}"
+@inject IHttpClientFactory _clientFactory
+@inject NavigationManager uriHelper
+@inject IJSRuntime js
+
+<h3>Edit</h3>
+
+<Form ButtonText="Update" review="review"
+      OnValidSubmit="@EditReview" />
+
+@code {
+    [Parameter] public int reviewId { get; set; }
+    Review review = new Review();
+    HttpClient client;
+    protected override async Task OnInitializedAsync()
+    {
+        client = _clientFactory.CreateClient("NearXServer");
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+
+        review = await client.GetFromJsonAsync<Review>($"api/review/{reviewId}");
+    }
+
+    async Task EditReview()
+    {
+        await client.PutAsJsonAsync("api/review", review);
+        await js.InvokeVoidAsync("alert", $"Updated Successfully!");
+        uriHelper.NavigateTo("reviews");
+
+    }
+}

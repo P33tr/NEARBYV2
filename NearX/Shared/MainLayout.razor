@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 <MudThemeProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
@@ -7,6 +8,8 @@
     <MudAppBar Elevation="10">
         <MudText Typo="Typo.h5">Nearby Cafe</MudText>   
         <MudSpacer/>
+        <MudFab Color="Color.Primary" Icon="@Icons.Filled.Reviews" Size="Size.Small" IconSize="Size.Small" Label="Reviews"
+                OnClick="@((e) => GotoReviews())"></MudFab>
         <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.Add" aria-label="add" OnClick="@((e) => ClickedIt())"/>
     </MudAppBar>
     <MudMainContent>
@@ -18,5 +21,11 @@
     void ClickedIt()
     {
         Snackbar.Add(" <MudAlert Severity='Severity.Info'>The reactor was fired up successfully</MudAlert>", severity:Severity.Success);
+    }
+
+    void GotoReviews()
+    {
+        Snackbar.Add(" <MudAlert Severity='Severity.Info'>Going to Reviews.</MudAlert>", severity:Severity.Success);
+        NavigationManager.NavigateTo("Reviews");
     }
 }
