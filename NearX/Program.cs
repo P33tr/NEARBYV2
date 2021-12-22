@@ -37,4 +37,10 @@ builder.Services.AddHttpClient("NearXServer", (cl) =>
     cl.BaseAddress = new Uri(serverEndpoint);
 });
 
+builder.Services.AddOidcAuthentication(options =>
+{
+    builder.Configuration.Bind("Auth0", options.ProviderOptions);
+    options.ProviderOptions.ResponseType = "code";
+});
+
 await builder.Build().RunAsync();
