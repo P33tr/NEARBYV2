@@ -5,3 +5,7 @@ https://codewithmukesh.com/blog/authentication-in-blazor-webassembly/
 setting up mariaDB
 ==================
 https://blog.georgekosmidis.net/2020/07/15/using-mariadb-in-an-aspnet-core-api-with-entity-framework-core/
+
+Using Auth0
+https://auth0.com/blog/securing-blazor-webassembly-apps/
+
