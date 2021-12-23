@@ -43,4 +43,5 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.ResponseType = "code";
 });
 
+
 await builder.Build().RunAsync();

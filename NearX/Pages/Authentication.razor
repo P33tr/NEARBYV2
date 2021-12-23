@@ -1,23 +1,49 @@
 ﻿@* Client/Pages/Authentication.razor *@
 
 @page "/authentication/{action}"
+@inject IAccessTokenProvider AuthenticationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.Extensions.Configuration
 
 @inject NavigationManager Navigation
 @inject IConfiguration Configuration
 
-<RemoteAuthenticatorView Action="@Action">
+<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="GetAccessToken" OnLogOutSucceeded="LogoutAction">
     <LogOut>
-        @{
+        @*        @{
             var authority = (string)Configuration["Auth0:Authority"];
             var clientId = (string)Configuration["Auth0:ClientId"];
 
             Navigation.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
-        }
+        }*@
+        You are logged Out.
     </LogOut>
 </RemoteAuthenticatorView>
 
 @code{
     [Parameter] public string Action { get; set; }
+
+    public async Task GetAccessToken(RemoteAuthenticationState state)
+    {
+        var tokenResult = await AuthenticationService.RequestAccessToken();
+
+        if (tokenResult.TryGetToken(out AccessToken accessToken))
+        {
+            Console.WriteLine(accessToken);
+        }
+        else
+        {
+            Navigation.NavigateTo(tokenResult.RedirectUrl);
+        }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var id = user.FindFirst(c => c.Type == "sub")?.Value;
+    }
+
+    public async Task LogoutAction(RemoteAuthenticationState state)
+    {
+        Navigation.NavigateTo("/");
+    }
+
 }
