@@ -1,11 +1,17 @@
 ﻿@page "/review/create"
 @inject IHttpClientFactory _clientFactory
 @inject NavigationManager _navManager
+<AuthorizeView>
+<Authorized>
+    <h3>Create</h3>
 
-<h3>Create</h3>
-
-<Form ButtonText="Create Review" review="@review"
-      OnValidSubmit="@CreateReview" />
+    <Form ButtonText="Create Review" review="@review"
+          OnValidSubmit="@CreateReview" />
+</Authorized>
+<NotAuthorized>
+    <LoginRedirect/>
+</NotAuthorized>
+</AuthorizeView>
 
 @code {
     Review review = new Review();
