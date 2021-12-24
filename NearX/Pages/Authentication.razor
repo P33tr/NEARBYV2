@@ -1,23 +1,92 @@
 ﻿@* Client/Pages/Authentication.razor *@
 
 @page "/authentication/{action}"
+@inject IAccessTokenProvider AuthenticationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject StateContainer StateContainer
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.Extensions.Configuration
 
 @inject NavigationManager Navigation
 @inject IConfiguration Configuration
 
-<RemoteAuthenticatorView Action="@Action">
+@*<RemoteAuthenticatorView Action="@Action" 
+                         OnLogInSucceeded="GetAccessToken" 
+                         OnLogOutSucceeded="LogoutAction">*@
+<RemoteAuthenticatorView Action="@Action" OnLogOutSucceeded="LogoutAction">
     <LogOut>
         @{
             var authority = (string)Configuration["Auth0:Authority"];
             var clientId = (string)Configuration["Auth0:ClientId"];
-
             Navigation.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
         }
     </LogOut>
+    <CompletingLoggingIn>
+        <LoadingComponent IsLoading="true"></LoadingComponent>
+        <h1>Completing Logging In </h1>
+    </CompletingLoggingIn>
+@*    <CompletingLogOut>
+        <LoadingComponent IsLoading="true"></LoadingComponent>
+        <h1>Completing Log Out</h1>
+    </CompletingLogOut>*@
+    <LoggingIn>
+        <LoadingComponent IsLoading="true"></LoadingComponent>
+        <h1>Logging In</h1>
+    </LoggingIn>
+    <LogInFailed>
+        <h1 style="color:red;">
+            Login Failed
+        </h1>
+    </LogInFailed>
+<LogOutFailed>
+        <h1 style="color:red;">
+            Log Out Failed
+        </h1>
+    </LogOutFailed>
+    <LogOutSucceeded>
+        <h1>
+            Log Out Succeeded
+        </h1>
+    </LogOutSucceeded>
+    <Registering>
+        <LoadingComponent IsLoading="true"></LoadingComponent>
+        <h1>Registering</h1>
+    </Registering>
+    <UserProfile>
+        <h1>
+            User Profile
+        </h1>
+    </UserProfile>
 </RemoteAuthenticatorView>
 
 @code{
     [Parameter] public string Action { get; set; }
+
+    //public async Task GetAccessToken(RemoteAuthenticationState state)
+    //{
+    //    var tokenResult = await AuthenticationService.RequestAccessToken();
+
+    //    if (tokenResult.TryGetToken(out AccessToken accessToken))
+    //    {
+    //        Console.WriteLine(accessToken);
+    //    }
+    //    else
+    //    {
+    //        Navigation.NavigateTo(tokenResult.RedirectUrl);
+    //    }
+    //    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    //    var user = authState.User;
+    //    var id = user.FindFirst(c => c.Type == "sub")?.Value;
+    //    StateContainer.UserId = id;
+    //    StateContainer.UserName = user.Identity.Name;
+    //    StateContainer.OnChange += StateHasChanged;
+    //}
+
+    public async Task LogoutAction(RemoteAuthenticationState state)
+    {
+
+        Navigation.NavigateTo("/");
+    }
+
+
 }

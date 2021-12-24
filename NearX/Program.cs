@@ -43,4 +43,8 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.ResponseType = "code";
 });
 
+// Add the state container
+// =======================
+builder.Services.AddSingleton<StateContainer>();
+
 await builder.Build().RunAsync();

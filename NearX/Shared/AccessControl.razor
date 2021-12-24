@@ -1,5 +1,5 @@
 ﻿@* Client/Shared/AccessControl.razor *@
-
+@*@inject StateContainer StateContainer*@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
@@ -7,7 +7,7 @@
 @inject SignOutSessionStateManager SignOutManager
 
 <AuthorizeView>
-    <Authorized>
+    <Authorized>@*@StateContainer.UserId*@
         Hello, @context.User.Identity.Name!
         <MudButton @onclick="BeginSignOut">Log out</MudButton>
     </Authorized>
@@ -26,4 +26,13 @@
     {
         Navigation.NavigateTo("authentication/login");
     }
+
+    //protected override void OnInitialized()
+    //{
+    //    StateContainer.OnChange += StateHasChanged;
+    //}
+    //public void Dispose()
+    //{
+    //    StateContainer.OnChange -= StateHasChanged;
+    //}
 }
