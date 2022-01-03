@@ -6,14 +6,17 @@
         <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
     </TitleContent>
     <DialogContent>
-@*        <MudForm Model="@review">
+        <MudForm Model="@review" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
             <MudTextField 
+                T="string"
+                Required="true"
+                HelperText="Enter your review here."
+                RequiredError="Review text is required."
                 @bind-value="review.Note"
-                Validation="@(reviewValidator.ValidateValue)"
                 For="@(()=>review.Note)"
                 Immediate="true"
                 Label="Review"></MudTextField>
-        </MudForm>*@
+        </MudForm>
         <MudFab 
             Color="Color.Secondary" 
             Icon="@Icons.TwoTone.SaveAlt" 
@@ -40,9 +43,10 @@
     public Element cafe { get; set; } = new Element();
 
     NearXShared.Models.Review review = new NearXShared.Models.Review();
-    //ReviewModelFluentValidator reviewValidator = new ReviewModelFluentValidator();
-
-
+    
+    MudForm form;
+    bool success;
+    string[] errors = { };
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
 
