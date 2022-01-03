@@ -24,8 +24,8 @@ namespace NearXServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ElementId")
-                        .HasColumnType("int");
+                    b.Property<long>("ElementId")
+                        .HasColumnType("long");
 
                     b.Property<string>("Note")
                         .IsRequired()

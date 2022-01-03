@@ -65,7 +65,7 @@
         Console.WriteLine($"Cafe id is {cafe.id}");
         Console.WriteLine($"Cafe review is {review.Note}");
         review.UserId = _stateContainer.UserId;
-        review.ElementId = (int)cafe.id;
+        review.ElementId = cafe.id;
         HttpClient client = _clientFactory.CreateClient("NearXServer");
         await client.PostAsJsonAsync("api/review", review);
         MudDialog.Close(DialogResult.Ok(true));
