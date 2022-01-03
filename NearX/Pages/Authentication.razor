@@ -3,7 +3,7 @@
 @page "/authentication/{action}"
 @inject IAccessTokenProvider AuthenticationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject StateContainer StateContainer
+@inject StateContainer _stateContainer
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.Extensions.Configuration
 
@@ -13,7 +13,9 @@
 @*<RemoteAuthenticatorView Action="@Action" 
                          OnLogInSucceeded="GetAccessToken" 
                          OnLogOutSucceeded="LogoutAction">*@
-<RemoteAuthenticatorView Action="@Action" OnLogOutSucceeded="LogoutAction">
+<RemoteAuthenticatorView Action="@Action" 
+                         OnLogOutSucceeded="LogoutAction"
+                         OnLogInSucceeded="GetAccessToken">
     <LogOut>
         @{
             var authority = (string)Configuration["Auth0:Authority"];
@@ -62,25 +64,25 @@
 @code{
     [Parameter] public string Action { get; set; }
 
-    //public async Task GetAccessToken(RemoteAuthenticationState state)
-    //{
-    //    var tokenResult = await AuthenticationService.RequestAccessToken();
+    public async Task GetAccessToken(RemoteAuthenticationState state)
+    {
+        var tokenResult = await AuthenticationService.RequestAccessToken();
 
-    //    if (tokenResult.TryGetToken(out AccessToken accessToken))
-    //    {
-    //        Console.WriteLine(accessToken);
-    //    }
-    //    else
-    //    {
-    //        Navigation.NavigateTo(tokenResult.RedirectUrl);
-    //    }
-    //    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    //    var user = authState.User;
-    //    var id = user.FindFirst(c => c.Type == "sub")?.Value;
-    //    StateContainer.UserId = id;
-    //    StateContainer.UserName = user.Identity.Name;
-    //    StateContainer.OnChange += StateHasChanged;
-    //}
+        if (tokenResult.TryGetToken(out AccessToken accessToken))
+        {
+            Console.WriteLine(accessToken);
+        }
+        else
+        {
+            Navigation.NavigateTo(tokenResult.RedirectUrl);
+        }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var id = user.FindFirst(c => c.Type == "sub")?.Value;
+        _stateContainer.UserId = id;
+        _stateContainer.UserName = user.Identity.Name;
+        _stateContainer.OnChange += StateHasChanged;
+    }
 
     public async Task LogoutAction(RemoteAuthenticationState state)
     {

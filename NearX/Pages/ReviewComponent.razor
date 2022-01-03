@@ -1,6 +1,8 @@
 ﻿@using NearX.Models
 @inject IDialogService _dialogService
 @inject NavigationManager _navManager
+@inject StateContainer _stateContainer
+@inject IHttpClientFactory _clientFactory
 
 <AuthorizeView>
     <Authorized>
@@ -20,31 +22,28 @@
                     Immediate="true"
                     Label="Review"></MudTextField>
             </MudForm>
+
+        </DialogContent>
+        <DialogActions>
             <MudFab
-                Color="Color.Secondary"
+                Color="Color.Primary"
                 Icon="@Icons.TwoTone.SaveAlt"
                 Size="Size.Small"
                 IconSize="Size.Small"
                 Label="Save"
                 OnClick="SaveReview"></MudFab>
-        </DialogContent>
-        <DialogActions>
             <MudFab
                 Color="Color.Secondary"
                 Icon="@Icons.TwoTone.Close"
                 Size="Size.Small"
                 IconSize="Size.Small"
-                Label="Close"
-                OnClick="Close"></MudFab>
+                Label="Cancel"
+                OnClick="Cancel"></MudFab>
         </DialogActions>
     </MudDialog>
     </Authorized>
     <NotAuthorized>
-        @{
-        var returnUrl =
-        _navManager.ToBaseRelativePath(_navManager.Uri);
-        }
-        <LoginRedirect ReturnUrl="@returnUrl"/>
+
     </NotAuthorized>
 </AuthorizeView>
 @code {
@@ -59,17 +58,17 @@
     bool success;
     string[] errors = { };
 
-    void Close() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Close(DialogResult.Ok(true));
 
-    public void SaveReview(MouseEventArgs args)
+    public async Task SaveReview(MouseEventArgs args)
     {
         Console.WriteLine($"Cafe id is {cafe.id}");
-        //var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
-        //var parameters = new DialogParameters()
-        //{
-        //    ["cafe"] = cafe
-        //};
-        //_dialogService.Show<ReviewComponent>("Cafe", parameters, options);
+        Console.WriteLine($"Cafe review is {review.Note}");
+        review.UserId = _stateContainer.UserId;
+        review.ElementId = (int)cafe.id;
+        HttpClient client = _clientFactory.CreateClient("NearXServer");
+        await client.PostAsJsonAsync("api/review", review);
+        MudDialog.Close(DialogResult.Ok(true));
     }
 }
 

@@ -1,6 +1,8 @@
 ﻿@page "/review/create"
 @inject IHttpClientFactory _clientFactory
 @inject NavigationManager _navManager
+@inject StateContainer _stateContainer
+
 <AuthorizeView>
 <Authorized>
     <h3>Create</h3>
@@ -20,6 +22,7 @@
     Review review = new Review();
     async Task CreateReview()
     {
+        review.UserId = _stateContainer.UserId;
         HttpClient client = _clientFactory.CreateClient("NearXServer");
         await client.PostAsJsonAsync("api/review", review);
 
