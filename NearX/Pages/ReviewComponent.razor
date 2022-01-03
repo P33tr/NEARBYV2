@@ -1,41 +1,46 @@
 ﻿@using NearX.Models
 @inject IDialogService _dialogService;
-
-<MudDialog>
-    <TitleContent>
-        <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
-    </TitleContent>
-    <DialogContent>
-        <MudForm Model="@review" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudTextField 
-                T="string"
-                Required="true"
-                HelperText="Enter your review here."
-                RequiredError="Review text is required."
-                @bind-value="review.Note"
-                For="@(()=>review.Note)"
-                Immediate="true"
-                Label="Review"></MudTextField>
-        </MudForm>
-        <MudFab 
-            Color="Color.Secondary" 
-            Icon="@Icons.TwoTone.SaveAlt" 
-            Size="Size.Small" 
-            IconSize="Size.Small" 
-            Label="Save"
+<AuthorizeView>
+    <Authorized>
+    <MudDialog>
+        <TitleContent>
+            <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
+        </TitleContent>
+        <DialogContent>
+            <MudForm Model="@review" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField
+                    T="string"
+                    Required="true"
+                    HelperText="Enter your review here."
+                    RequiredError="Review text is required."
+                    @bind-value="review.Note"
+                    For="@(() => review.Note)"
+                    Immediate="true"
+                    Label="Review"></MudTextField>
+            </MudForm>
+            <MudFab
+                Color="Color.Secondary"
+                Icon="@Icons.TwoTone.SaveAlt"
+                Size="Size.Small"
+                IconSize="Size.Small"
+                Label="Save"
                 OnClick="SaveReview"></MudFab>
-    </DialogContent>
-    <DialogActions>
-        <MudFab 
-            Color="Color.Secondary" 
-            Icon="@Icons.TwoTone.Close" 
-            Size="Size.Small" 
-            IconSize="Size.Small" 
-            Label="Close"
-            OnClick="Close"></MudFab>
-    </DialogActions>
-</MudDialog>
-
+        </DialogContent>
+        <DialogActions>
+            <MudFab
+                Color="Color.Secondary"
+                Icon="@Icons.TwoTone.Close"
+                Size="Size.Small"
+                IconSize="Size.Small"
+                Label="Close"
+                OnClick="Close"></MudFab>
+        </DialogActions>
+    </MudDialog>
+    </Authorized>
+    <NotAuthorized>
+        <LoginRedirect/>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
