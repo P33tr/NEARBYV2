@@ -2,8 +2,11 @@
 @inject NavigationManager _navigationManager
 
 @code {
+    [Parameter]
+    public string ReturnUrl {get; set;}
+
     protected override void OnInitialized()
     {
-        _navigationManager.NavigateTo("authentication/login");
+        _navigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(ReturnUrl)}", forceLoad:true);
     }
 }

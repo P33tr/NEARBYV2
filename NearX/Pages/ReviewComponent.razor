@@ -1,5 +1,7 @@
 ﻿@using NearX.Models
-@inject IDialogService _dialogService;
+@inject IDialogService _dialogService
+@inject NavigationManager _navManager
+
 <AuthorizeView>
     <Authorized>
     <MudDialog>
@@ -38,7 +40,11 @@
     </MudDialog>
     </Authorized>
     <NotAuthorized>
-        <LoginRedirect/>
+        @{
+        var returnUrl =
+        _navManager.ToBaseRelativePath(_navManager.Uri);
+        }
+        <LoginRedirect ReturnUrl="@returnUrl"/>
     </NotAuthorized>
 </AuthorizeView>
 @code {
