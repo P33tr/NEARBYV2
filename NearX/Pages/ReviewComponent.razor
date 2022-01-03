@@ -1,0 +1,61 @@
+﻿@using NearX.Models
+@inject IDialogService _dialogService;
+
+<MudDialog>
+    <TitleContent>
+        <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
+    </TitleContent>
+    <DialogContent>
+@*        <MudForm Model="@review">
+            <MudTextField 
+                @bind-value="review.Note"
+                Validation="@(reviewValidator.ValidateValue)"
+                For="@(()=>review.Note)"
+                Immediate="true"
+                Label="Review"></MudTextField>
+        </MudForm>*@
+        <MudFab 
+            Color="Color.Secondary" 
+            Icon="@Icons.TwoTone.SaveAlt" 
+            Size="Size.Small" 
+            IconSize="Size.Small" 
+            Label="Save"
+                OnClick="SaveReview"></MudFab>
+    </DialogContent>
+    <DialogActions>
+        <MudFab 
+            Color="Color.Secondary" 
+            Icon="@Icons.TwoTone.Close" 
+            Size="Size.Small" 
+            IconSize="Size.Small" 
+            Label="Close"
+            OnClick="Close"></MudFab>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Element cafe { get; set; } = new Element();
+
+    NearXShared.Models.Review review = new NearXShared.Models.Review();
+    //ReviewModelFluentValidator reviewValidator = new ReviewModelFluentValidator();
+
+
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    public void SaveReview(MouseEventArgs args)
+    {
+        Console.WriteLine($"Cafe id is {cafe.id}");
+        //var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+        //var parameters = new DialogParameters()
+        //{
+        //    ["cafe"] = cafe
+        //};
+        //_dialogService.Show<ReviewComponent>("Cafe", parameters, options);
+    }
+}
+
+

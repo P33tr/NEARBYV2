@@ -1,6 +1,13 @@
 ﻿<EditForm Model="@review" OnValidSubmit="@OnValidSubmit">
     <DataAnnotationsValidator />
     <div class="form-group">
+        <label>Element Id :</label>
+        <div>
+            <input @bind="@review.ElementId" />
+            <ValidationMessage For="@(() => review.ElementId)" />
+        </div>
+    </div>
+    <div class="form-group">
         <label>Note :</label>
         <div>
             <InputText @bind-Value="@review.Note" />

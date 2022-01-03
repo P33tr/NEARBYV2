@@ -1,5 +1,5 @@
 ﻿@using NearX.Models
-
+@inject IDialogService _dialogService;
 
 <MudDialog>
     <TitleContent>
@@ -11,17 +11,30 @@
                 <MudTd>@context.Name</MudTd>
                 @if(@context.IsLink)
                 {
-                <MudTd><MudLink Href="@context.Value" Target="_blank">@context.Value</MudLink></MudTd>
+                    <MudTd><MudLink Href="@context.Value" Target="_blank">@context.Value</MudLink></MudTd>
                 }
                 else
                 {
-                <MudTd>@context.Value</MudTd>
+                    <MudTd>@context.Value</MudTd>
                 }
             </RowTemplate>
         </MudTable>
+        <MudFab 
+            Color="Color.Secondary" 
+            Icon="@Icons.TwoTone.RateReview" 
+            Size="Size.Small" 
+            IconSize="Size.Small" 
+            Label="Add Review"
+                OnClick="ShowReviewDialog"></MudFab>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close">Close</MudButton>
+        <MudFab 
+            Color="Color.Secondary" 
+            Icon="@Icons.TwoTone.Close" 
+            Size="Size.Small" 
+            IconSize="Size.Small" 
+            Label="Close"
+            OnClick="Close"></MudFab>
     </DialogActions>
 </MudDialog>
 
@@ -33,6 +46,17 @@
 
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    public void ShowReviewDialog(MouseEventArgs args)
+    {
+        Console.WriteLine($"Cafe id is {cafe.id}");
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+        var parameters = new DialogParameters()
+        {
+            ["cafe"] = cafe
+        };
+        _dialogService.Show<ReviewComponent>("Cafe", parameters, options);
+    }
 }
 
 
