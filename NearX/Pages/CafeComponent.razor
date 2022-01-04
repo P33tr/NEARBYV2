@@ -81,7 +81,9 @@
             ["cafe"] = cafe
         };
 
-        _dialogService.Show<ReviewComponent>("Cafe", parameters, options);
+        var result = _dialogService.Show<ReviewComponent>("Cafe", parameters, options);
+        StateHasChanged();
+
     }
 }
 

@@ -74,6 +74,7 @@
         HttpClient client = _clientFactory.CreateClient("NearXServer");
         await client.PostAsJsonAsync("api/review", review);
         MudDialog.Close(DialogResult.Ok(true));
+
     }
 }
 
