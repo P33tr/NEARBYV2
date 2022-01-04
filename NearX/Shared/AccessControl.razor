@@ -1,7 +1,9 @@
 ﻿@* Client/Shared/AccessControl.razor *@
-@*@inject StateContainer StateContainer*@
+@inject StateContainer _stateContainer
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
 
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
@@ -17,6 +19,28 @@
 </AuthorizeView>
 
 @code{
+    private string _authMessage; 
+    private string _userId;
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+    protected override async void OnInitialized()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _authMessage = $"{user.Identity.Name} is authenticated.";
+            _claims = user.Claims;
+            _userId = user.FindFirst(c => c.Type == "sub")?.Value;
+            _stateContainer.UserId = _userId;
+        }
+        else
+        {
+            _authMessage = "The user is NOT authenticated.";
+        }
+
+    }
+
     private async Task BeginSignOut(MouseEventArgs args)
     {
         await SignOutManager.SetSignOutState();

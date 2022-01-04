@@ -1,0 +1,81 @@
+﻿@using NearX.Models
+@inject IDialogService _dialogService
+@inject NavigationManager _navManager
+@inject StateContainer _stateContainer
+@inject IHttpClientFactory _clientFactory
+
+<AuthorizeView>
+    <Authorized>
+    <MudDialog>
+        <TitleContent>
+            <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
+        </TitleContent>
+        <DialogContent>
+            <MudForm Model="@review" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField
+                    T="string"
+                    Required="true"
+                    HelperText="Enter your review here."
+                    RequiredError="Review text is required."
+                    @bind-value="review.Note"
+                    For="@(() => review.Note)"
+                    Immediate="true"
+                    Label="Review"
+                    Lines="10"></MudTextField>
+            </MudForm>
+
+        </DialogContent>
+        <DialogActions>
+            <MudFab
+                Color="Color.Primary"
+                Icon="@Icons.TwoTone.SaveAlt"
+                Size="Size.Small"
+                IconSize="Size.Small"
+                Label="Save"
+                OnClick="SaveReview"></MudFab>
+            <MudFab
+                Color="Color.Secondary"
+                Icon="@Icons.TwoTone.Close"
+                Size="Size.Small"
+                IconSize="Size.Small"
+                Label="Cancel"
+                OnClick="Cancel"></MudFab>
+        </DialogActions>
+    </MudDialog>
+    </Authorized>
+    <NotAuthorized>
+        @{
+            var returnUrl =
+                _navManager.ToBaseRelativePath(_navManager.Uri);
+        }
+        <LoginRedirect ReturnUrl="@returnUrl"/>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Element cafe { get; set; } = new Element();
+
+    NearXShared.Models.Review review = new NearXShared.Models.Review();
+    
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    void Cancel() => MudDialog.Close(DialogResult.Ok(true));
+
+    public async Task SaveReview(MouseEventArgs args)
+    {
+        Console.WriteLine($"Cafe id is {cafe.id}");
+        Console.WriteLine($"Cafe review is {review.Note}");
+        review.UserId = _stateContainer.UserId;
+        review.ElementId = cafe.id;
+        HttpClient client = _clientFactory.CreateClient("NearXServer");
+        await client.PostAsJsonAsync("api/review", review);
+        MudDialog.Close(DialogResult.Ok(true));
+
+    }
+}
+
+

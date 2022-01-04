@@ -9,7 +9,11 @@ namespace NearXShared.Models
     public class Review
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+
+        public string UserId { get; set; }
+
         public string Note { get; set; }
+
+        public long ElementId { get; set; }
     }
 }
