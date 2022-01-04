@@ -23,6 +23,14 @@ namespace NearXServer.Controllers
             return Ok(reviews);
         }
 
+        [HttpGet]
+        [Route("count/{elementid}")]
+        public async Task<IActionResult> Count(int elementid)
+        {
+            int reviewCount = await _context.Reviews.CountAsync(x => x.ElementId == elementid);
+            return Ok(reviewCount);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {

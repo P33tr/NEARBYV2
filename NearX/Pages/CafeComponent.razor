@@ -1,6 +1,6 @@
 ﻿@using NearX.Models
 @inject IDialogService _dialogService;
-
+@inject IHttpClientFactory _clientFactory;
 <MudDialog>
     <TitleContent>
         <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>
@@ -19,20 +19,32 @@
                 }
             </RowTemplate>
         </MudTable>
-        <MudFab 
-            Color="Color.Secondary" 
-            Icon="@Icons.TwoTone.RateReview" 
-            Size="Size.Small" 
-            IconSize="Size.Small" 
-            Label="Add Review"
-                OnClick="ShowReviewDialog"></MudFab>
+
     </DialogContent>
     <DialogActions>
-        <MudFab 
-            Color="Color.Secondary" 
-            Icon="@Icons.TwoTone.Close" 
-            Size="Size.Small" 
-            IconSize="Size.Small" 
+        @{
+            if (reviewCount > 0)
+            {
+                <MudButton>@reviewCount Reviews</MudButton>
+            }
+            else
+            {
+                <span>No reviews yet.</span>
+            }
+        }
+        
+        <MudFab
+            Color="Color.Primary"
+            Icon="@Icons.TwoTone.RateReview"
+            Size="Size.Small"
+            IconSize="Size.Small"
+            Label="Add Review"
+            OnClick="ShowReviewDialog"></MudFab>
+        <MudFab
+            Color="Color.Secondary"
+            Icon="@Icons.TwoTone.Close"
+            Size="Size.Small"
+            IconSize="Size.Small"
             Label="Close"
             OnClick="Close"></MudFab>
     </DialogActions>
@@ -44,13 +56,26 @@
     [Parameter]
     public Element cafe { get; set; } = new Element();
 
+    public int reviewCount = 0;
+    HttpClient client;
+    NearXShared.Models.Review[] reviews { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        client = _clientFactory.CreateClient("NearXServer");
+        reviewCount = await client.GetFromJsonAsync<int>($"api/review/count/{cafe.id}");
+    }
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
 
     public void ShowReviewDialog(MouseEventArgs args)
     {
         Console.WriteLine($"Cafe id is {cafe.id}");
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
         var parameters = new DialogParameters()
         {
             ["cafe"] = cafe

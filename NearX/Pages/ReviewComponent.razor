@@ -20,7 +20,8 @@
                     @bind-value="review.Note"
                     For="@(() => review.Note)"
                     Immediate="true"
-                    Label="Review"></MudTextField>
+                    Label="Review"
+                    Lines="10"></MudTextField>
             </MudForm>
 
         </DialogContent>
@@ -43,7 +44,11 @@
     </MudDialog>
     </Authorized>
     <NotAuthorized>
-
+        @{
+            var returnUrl =
+                _navManager.ToBaseRelativePath(_navManager.Uri);
+        }
+        <LoginRedirect ReturnUrl="@returnUrl"/>
     </NotAuthorized>
 </AuthorizeView>
 @code {
