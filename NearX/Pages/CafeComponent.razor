@@ -1,6 +1,8 @@
 ﻿@using NearX.Models
 @inject IDialogService _dialogService;
 @inject IHttpClientFactory _clientFactory;
+@inject StateContainer _stateContainer
+@implements IDisposable
 <MudDialog>
     <TitleContent>
         <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>
@@ -25,7 +27,13 @@
         @{
             if (reviewCount > 0)
             {
-                <MudButton>@reviewCount Reviews</MudButton>
+                <MudFab
+                    Color="Color.Primary"
+                    Icon="@Icons.TwoTone.List"
+                    Size="Size.Small"
+                    IconSize="Size.Small"
+                    Label= "@reviewLabel"
+                    OnClick="ListReviewDialog"></MudFab>
             }
             else
             {
@@ -51,21 +59,54 @@
 </MudDialog>
 
 @code {
+
+
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
     public Element cafe { get; set; } = new Element();
 
     public int reviewCount = 0;
+
+    private string reviewLabel = string.Empty;
     HttpClient client;
     NearXShared.Models.Review[] reviews { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        _stateContainer.OnChange += StateHasChanged;
         client = _clientFactory.CreateClient("NearXServer");
         reviewCount = await client.GetFromJsonAsync<int>($"api/review/count/{cafe.id}");
+        reviewLabel = $"{reviewCount} Reviews";
     }
-
+    /// <summary>
+    /// Runs after each time the component is rendered
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
     void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    public void ListReviewDialog(MouseEventArgs args)
+    {
+        Console.WriteLine($"Cafe id is {cafe.id}");
+        var options = new DialogOptions() 
+        { 
+            CloseButton = true, 
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+        var parameters = new DialogParameters()
+        {
+            ["cafe"] = cafe
+        };
+
+        var result = _dialogService.Show<ListReviewsComponent>("Reviews", parameters, options);
+        
+
+    }
 
     public void ShowReviewDialog(MouseEventArgs args)
     {
@@ -82,8 +123,13 @@
         };
 
         var result = _dialogService.Show<ReviewComponent>("Cafe", parameters, options);
-        StateHasChanged();
+        
 
+    }
+
+    public void Dispose()
+    {
+        _stateContainer.OnChange -= StateHasChanged;
     }
 }
 

@@ -5,6 +5,8 @@
         private string? _userName;
         private string _userId;
 
+        private int _reviewCount;
+
         public string UserId
         {
             get { return _userId ?? string.Empty; }
@@ -25,8 +27,22 @@
             }
         }
 
-        public event Action? OnChange;
+        public int ReviewCount
+        {
+            get => _reviewCount;
+            set
+            {
+                _reviewCount = value;
+                NotifyStateChanged();
+            }
+        }
+        
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        public event Action OnChange;
+
+        private void NotifyStateChanged()
+        {
+            OnChange?.Invoke();
+        }
     }
 }
