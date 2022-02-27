@@ -10,8 +10,8 @@ using NearXServer.Data;
 namespace NearXServer.Migrations
 {
     [DbContext(typeof(MariaDbContext))]
-    [Migration("20220103150856_init")]
-    partial class init
+    [Migration("20220226172705_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,8 +26,8 @@ namespace NearXServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ElementId")
-                        .HasColumnType("int");
+                    b.Property<long>("ElementId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Note")
                         .IsRequired()

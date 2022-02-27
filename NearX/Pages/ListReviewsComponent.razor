@@ -5,35 +5,40 @@
 @inject IHttpClientFactory _clientFactory
 @implements IDisposable
 
-<AuthorizeView>
-    <Authorized>
     <MudDialog>
         <TitleContent>
             <MudIcon Icon="@Icons.Material.Filled.LocalCafe"></MudIcon>Review
         </TitleContent>
         <DialogContent>
-            <MudForm Model="@review" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField
-                    T="string"
-                    Required="true"
-                    HelperText="Enter your review here."
-                    RequiredError="Review text is required."
-                    @bind-value="review.Note"
-                    For="@(() => review.Note)"
-                    Immediate="true"
-                    Label="Review"
-                    Lines="10"></MudTextField>
-            </MudForm>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Element Id</th>
+                    <th>User Id</th>
+                    <th>Note</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (NearXShared.Models.Review review in reviews)
+                {
+                    <tr>
+                        <td>@review.Id</td>
+                        <td>@review.ElementId</td>
+                        <td>@review.UserId</td>
+                        <td>@review.Note</td>
+                        <td>
+                            <a class="btn btn-success" href="review/edit/@review.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+
+                </tbody>
+            </table>
 
         </DialogContent>
         <DialogActions>
-            <MudFab
-                Color="Color.Primary"
-                Icon="@Icons.TwoTone.SaveAlt"
-                Size="Size.Small"
-                IconSize="Size.Small"
-                Label="Save"
-                OnClick="SaveReview"></MudFab>
             <MudFab
                 Color="Color.Secondary"
                 Icon="@Icons.TwoTone.Close"
@@ -43,15 +48,6 @@
                 OnClick="Cancel"></MudFab>
         </DialogActions>
     </MudDialog>
-    </Authorized>
-    <NotAuthorized>
-        @{
-            var returnUrl =
-                _navManager.ToBaseRelativePath(_navManager.Uri);
-        }
-        <LoginRedirect ReturnUrl="@returnUrl"/>
-    </NotAuthorized>
-</AuthorizeView>
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
@@ -63,10 +59,14 @@
     MudForm form;
     bool success;
     string[] errors = { };
+    HttpClient client;
+    NearXShared.Models.Review[] reviews { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         _stateContainer.OnChange += StateHasChanged;
+        client = _clientFactory.CreateClient("NearXServer");
+        reviews = await client.GetFromJsonAsync<NearXShared.Models.Review[]>("api/review");
         
     }
 

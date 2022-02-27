@@ -25,7 +25,7 @@ namespace NearXServer.Migrations
                         .HasColumnType("int");
 
                     b.Property<long>("ElementId")
-                        .HasColumnType("long");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Note")
                         .IsRequired()
